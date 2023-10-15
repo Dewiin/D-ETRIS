@@ -14,3 +14,13 @@ SCORE_HEIGHT_FRACTION = 0.3
 #Window size
 WINDOW_WIDTH = GAME_WIDTH + SIDEBAR_WIDTH + (PADDING*3)
 WINDOW_HEIGHT = GAME_HEIGHT + (PADDING*2)
+
+TETROMINOS = {
+    'T' : {'shape' : [(-1,0),(0,0),(1,0),(0,-1)], 'color' : 'purple'},
+    'L' : {'shape' : [(-1,0),(0,0),(1,0),(0,-1)], 'color' : 'purple'},
+    'J' : {'shape' : [(-1,0),(0,0),(1,0),(0,-1)], 'color' : 'purple'},
+    'S' : {'shape' : [(-1,0),(0,0),(1,0),(0,-1)], 'color' : 'purple'},
+    'Z' : {'shape' : [(-1,0),(0,0),(1,0),(0,-1)], 'color' : 'purple'},
+    'O' : {'shape' : [(-1,0),(0,0),(1,0),(0,-1)], 'color' : 'purple'},
+    'I' : {'shape' : [(-1,0),(0,0),(1,0),(0,-1)], 'color' : 'purple'},
+}
