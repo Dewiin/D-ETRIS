@@ -11,6 +11,7 @@ class Main():
         pygame.init()
         self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         pygame.display.set_caption("D-ETRIS")
+        self.clock = pygame.time.Clock()
 
         #screen
         self.game_screen = Game()
@@ -33,8 +34,7 @@ class Main():
             #display
             pygame.display.update()
 
-
-        
+            self.clock.tick(60)      
 
 if __name__ == '__main__':
     main = Main()
