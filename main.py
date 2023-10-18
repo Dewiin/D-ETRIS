@@ -20,7 +20,7 @@ class Main():
 
     def run(self):
         while True:
-            self.screen.fill((40,40,40))
+            self.screen.fill(GRAY)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
