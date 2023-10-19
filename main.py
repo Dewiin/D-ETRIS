@@ -1,5 +1,6 @@
 from settings import *
 from sys import exit
+from random import choice
 
 from game import Game
 from score import Score
@@ -13,15 +14,27 @@ class Main():
         pygame.display.set_caption("D-ETRIS")
         self.clock = pygame.time.Clock()
 
+        #create next shapes
+        self.next_shapes = [choice(list(TETROMINOS.keys())) for i in range(3)]
+
         #screen
-        self.game_screen = Game()
+        self.game_screen = Game(self.get_next_shape)
         self.score_screen = Score()
-        self.preview_screen = Preview()
+        self.preview_screen = Preview(self.next_shapes)
+    
+    def get_next_shape(self):
+        next_shape = self.next_shapes.pop(0)
+        self.next_shapes.append(choice(list(TETROMINOS.keys())))
+        return next_shape
 
     def run(self):
         while True:
             self.screen.fill(GRAY)
             for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
+                    self.game_screen.tetromino.rotate_left()
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
+                    self.game_screen.tetromino.rotate_right()
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     exit()

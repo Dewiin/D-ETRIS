@@ -18,16 +18,16 @@ WINDOW_HEIGHT = GAME_HEIGHT + (PADDING*2)
 #Timer variables
 GAME_UPDATE_SPEED = 500
 INPUT_DELAY = 80
-ROTATE_DELAY = 200
+ROTATE_DELAY = 100
 
 #Colors
-PURPLE = '#b023cc'
-BLUE = '#1717BD'
-ORANGE = '#c97022'
-RED = '#a90404'
-GREEN = '#06840a'
-YELLOW = '#cca723'
-CYAN = '#1b8f9e'
+YELLOW = '#f1e60d'
+RED = '#e51b20'
+BLUE = '#204b9b'
+GREEN = '#65b32e'
+PURPLE = '#7b217f'
+CYAN = '#6cc6d9'
+ORANGE = '#f07e13'
 GRAY = '#282828'
 
 #Tetromino shapes

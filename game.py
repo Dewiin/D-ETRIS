@@ -4,18 +4,20 @@ from random import choice
 from dropTimer import Timer
 
 class Game():
-    def __init__(self):
+    def __init__(self, get_next_shape):
         #general
         self.image = pygame.Surface((GAME_WIDTH, GAME_HEIGHT)) #initialize display surface
         self.rect = self.image.get_rect(topleft = (PADDING, PADDING))
         self.display = pygame.display.get_surface()
         self.sprites = pygame.sprite.Group()
 
+        #next_shape
+        self.get_next_shape = get_next_shape
+
         #timer
         self.timers = {
             'Block falling' : Timer(GAME_UPDATE_SPEED, True, self.block_fall),
-            'Horizontal movement' : Timer(INPUT_DELAY, False, self.player_input),
-            'Rotation' : Timer(ROTATE_DELAY)
+            'Horizontal movement' : Timer(INPUT_DELAY, False, self.player_input)
         }
         self.timers['Block falling'].activate()
 
@@ -27,15 +29,15 @@ class Game():
 
     def draw_grid(self):
         for i in range(1, GAME_HEIGHT):
-            pygame.draw.line(self.image, 'white', (0, i*TILE_SIZE), (GAME_WIDTH, i*TILE_SIZE))
+            pygame.draw.line(self.image, GRAY, (0, i*TILE_SIZE), (GAME_WIDTH, i*TILE_SIZE))
         for j in range(1, GAME_WIDTH):
-            pygame.draw.line(self.image, 'white', (j*TILE_SIZE, 0), (j*TILE_SIZE, GAME_HEIGHT))
+            pygame.draw.line(self.image, GRAY, (j*TILE_SIZE, 0), (j*TILE_SIZE, GAME_HEIGHT))
 
         pygame.draw.rect(self.display, 'white', self.rect, 2, 2)        
 
     def create_new_tetromino(self):
         self.check_rows()
-        self.tetromino = Tetromino(choice(list(TETROMINOS.keys())), self.sprites, self.create_new_tetromino, self.field_data)
+        self.tetromino = Tetromino(self.get_next_shape(), self.sprites, self.create_new_tetromino, self.field_data)
 
     def block_fall(self):
         self.tetromino.block_fall()
@@ -54,15 +56,6 @@ class Game():
             if keys[pygame.K_s]:
                 self.tetromino.block_fall()
                 self.timers['Horizontal movement'].activate()
-
-        #rotation
-        if not self.timers['Rotation'].activated:
-            if keys[pygame.K_RIGHT]:
-                self.tetromino.rotate_right()
-                self.timers['Rotation'].activate()
-            if keys[pygame.K_LEFT]:
-                self.tetromino.rotate_left()
-                self.timers['Rotation'].activate()
 
     def check_rows(self):
         deleted_rows = []
@@ -104,7 +97,6 @@ class Game():
         #timers
         self.timers['Block falling'].update()
         self.timers['Horizontal movement'].update()
-        self.timers['Rotation'].update()
 
         #player input
         self.player_input()
@@ -132,16 +124,22 @@ class Tetromino():
         return False
     
     def block_fall(self):
+        #check if at floor
         if not self.bottom_colliding(1):
+            #drop tetromino
             for block in self.image:
                 block.pos.y += 1
         else:
+            #if at floor, add block positions into field_data
             for block in self.image:
                 self.field_data[int(block.pos.y)][int(block.pos.x)] = block
+            #create new tetromino
             self.create_new_tetromino()
 
     def move_horizontal(self, amount):
+        #check if at edge
         if not self.sides_colliding(amount):
+            #move horizontal
             for block in self.image:
                 block.pos.x += amount
 
