@@ -33,6 +33,7 @@ class Game():
         pygame.draw.rect(self.display, 'white', self.rect, 2, 2)        
 
     def create_new_tetromino(self):
+        self.check_rows()
         self.tetromino = Tetromino(choice(list(TETROMINOS.keys())), self.sprites, self.create_new_tetromino, self.field_data)
 
     def block_fall(self):
@@ -49,12 +50,38 @@ class Game():
             if(keys[pygame.K_s]):
                 self.tetromino.block_fall()
 
+    def check_rows(self):
+        deleted_rows = []
+        for row, row_values in enumerate(self.field_data):
+            if all(row_values):
+                deleted_rows.append(row)
+
+        if deleted_rows:
+            for delete_row in deleted_rows:
+
+                #delete full rows
+                for block in self.field_data[delete_row]:
+                    block.kill()
+
+                #move blocks down
+                for row in self.field_data:
+                    for block in row:
+                        if block and block.pos.y <= delete_row:
+                            block.pos.y += 1  
+
+            #rebuild field
+            self.field_data = [[0 for i in range(COL)] for j in range(ROW)]
+        
+            for block in self.sprites:
+                self.field_data[int(block.pos.y)][int(block.pos.x)] = block
+        
     def update(self):
         #draw panel
         self.display.blit(self.image, self.rect)
         self.image.fill(GRAY)
 
-        #draw tetrominos
+        #draw and update tetrominos
+        self.sprites.update()
         self.sprites.draw(self.image)
 
         #draw grid
@@ -92,7 +119,6 @@ class Tetromino():
         if not self.bottom_colliding(1):
             for block in self.image:
                 block.pos.y += 1
-                block.update()
         else:
             for block in self.image:
                 self.field_data[int(block.pos.y)][int(block.pos.x)] = block
@@ -102,14 +128,12 @@ class Tetromino():
         if not self.sides_colliding(amount):
             for block in self.image:
                 block.pos.x += amount
-                block.update()
 
 class Block(pygame.sprite.Sprite):
     def __init__(self, pos, color, group):
         super().__init__(group)
         self.image = pygame.Surface((TILE_SIZE, TILE_SIZE))
         self.image.fill(color)
-        self.group = group
 
         self.pos = pygame.Vector2(pos) + pygame.Vector2(4,0)#offset
         self.rect = self.image.get_rect(topleft = (self.pos * TILE_SIZE)) 
