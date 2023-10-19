@@ -14,7 +14,8 @@ class Game():
         #timer
         self.timers = {
             'Block falling' : Timer(GAME_UPDATE_SPEED, True, self.block_fall),
-            'Horizontal movement' : Timer(INPUT_DELAY, False, self.player_input)
+            'Horizontal movement' : Timer(INPUT_DELAY, False, self.player_input),
+            'Rotation' : Timer(ROTATE_DELAY)
         }
         self.timers['Block falling'].activate()
 
@@ -41,14 +42,27 @@ class Game():
 
     def player_input(self):
         keys = pygame.key.get_pressed()
+
+        #movement
         if not self.timers['Horizontal movement'].activated:
-            self.timers['Horizontal movement'].activate()
-            if(keys[pygame.K_a]):
+            if keys[pygame.K_a]:
                 self.tetromino.move_horizontal(-1)
-            if(keys[pygame.K_d]):
+                self.timers['Horizontal movement'].activate()
+            if keys[pygame.K_d]:
                 self.tetromino.move_horizontal(1)
-            if(keys[pygame.K_s]):
+                self.timers['Horizontal movement'].activate()
+            if keys[pygame.K_s]:
                 self.tetromino.block_fall()
+                self.timers['Horizontal movement'].activate()
+
+        #rotation
+        if not self.timers['Rotation'].activated:
+            if keys[pygame.K_RIGHT]:
+                self.tetromino.rotate_right()
+                self.timers['Rotation'].activate()
+            if keys[pygame.K_LEFT]:
+                self.tetromino.rotate_left()
+                self.timers['Rotation'].activate()
 
     def check_rows(self):
         deleted_rows = []
@@ -90,6 +104,7 @@ class Game():
         #timers
         self.timers['Block falling'].update()
         self.timers['Horizontal movement'].update()
+        self.timers['Rotation'].update()
 
         #player input
         self.player_input()
@@ -97,6 +112,7 @@ class Game():
 class Tetromino():
     def __init__(self, shape, group, create_new, field_data):
         #general
+        self.shape = shape
         self.positions = TETROMINOS[shape]['shape']
         self.color = TETROMINOS[shape]['color']
         self.field_data = field_data
@@ -129,6 +145,54 @@ class Tetromino():
             for block in self.image:
                 block.pos.x += amount
 
+    def rotate_right(self):
+        if self.shape != 'O':
+            #pivot point
+            pivot = self.image[2].pos
+
+            #new_block_positions
+            new_block_positions = [block.rotate_right(pivot) for block in self.image]
+
+            #collision check
+            for pos in new_block_positions:
+                #horizontal
+                if not 0 <= pos.x < COL:
+                    return
+                #field
+                if self.field_data[int(pos.y)][int(pos.x)]:
+                    return
+                #vertical
+                if not pos.y < ROW:
+                    return
+
+            #implement new positions
+            for i, block in enumerate(self.image):
+                block.pos = new_block_positions[i]
+
+    def rotate_left(self):
+        if self.shape != 'O':
+            #pivot point
+            pivot = self.image[2].pos
+
+            #new block positions
+            new_block_positions = [block.rotate_left(pivot) for block in self.image]
+
+            #collision check
+            for pos in new_block_positions:
+                #horizontal
+                if not 0 <= pos.x < COL:
+                    return
+                #field
+                if self.field_data[int(pos.y)][int(pos.x)]:
+                    return
+                #vertical
+                if not pos.y < ROW:
+                    return    
+        
+            #implement new positions
+            for i, block in enumerate(self.image):
+                block.pos = new_block_positions[i]
+
 class Block(pygame.sprite.Sprite):
     def __init__(self, pos, color, group):
         super().__init__(group)
@@ -149,6 +213,12 @@ class Block(pygame.sprite.Sprite):
             return True
         if y >= 0 and field_data[y][int(self.pos.x)]:
             return True
+
+    def rotate_right(self, pivot):
+        return pivot + (self.pos - pivot).rotate(90)
+    
+    def rotate_left(self, pivot):
+        return pivot + (self.pos - pivot).rotate(-90)
 
     def update(self):
         self.rect = self.image.get_rect(topleft = (self.pos * TILE_SIZE))

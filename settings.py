@@ -16,15 +16,16 @@ WINDOW_WIDTH = GAME_WIDTH + SIDEBAR_WIDTH + (PADDING*3)
 WINDOW_HEIGHT = GAME_HEIGHT + (PADDING*2)
 
 #Timer variables
-GAME_UPDATE_SPEED = 80
+GAME_UPDATE_SPEED = 500
 INPUT_DELAY = 80
+ROTATE_DELAY = 200
 
 #Colors
 PURPLE = '#b023cc'
-BLUE = '#1b23bf'
+BLUE = '#1717BD'
 ORANGE = '#c97022'
-RED = '#e80909'
-GREEN = '#1fbf2c'
+RED = '#a90404'
+GREEN = '#06840a'
 YELLOW = '#cca723'
 CYAN = '#1b8f9e'
 GRAY = '#282828'
@@ -32,12 +33,12 @@ GRAY = '#282828'
 #Tetromino shapes
 TETROMINOS = {
     'T' : {'shape' : [(-1,-1),(1,-1),(0,-1),(0,-2)], 'color' : PURPLE},
-    'J' : {'shape' : [(-1,-2),(0,-2),(1,-2),(1,-1)], 'color' : BLUE},
+    'J' : {'shape' : [(-1,-2),(1,-2),(0,-2),(1,-1)], 'color' : BLUE},
     'L' : {'shape' : [(-1,-1),(-1,-2),(0,-2),(1,-2)], 'color' : ORANGE},
     'Z' : {'shape' : [(-1,-2),(0,-2),(0,-1),(1,-1)], 'color' : RED},
-    'S' : {'shape' : [(-1,-1),(0,-1),(0,-2),(1,-2)], 'color' : GREEN},
+    'S' : {'shape' : [(-1,-1),(0,-2),(0,-1),(1,-2)], 'color' : GREEN},
     'O' : {'shape' : [(0,-1),(1,-1),(0,-2),(1,-2)], 'color' : YELLOW},
-    'I' : {'shape' : [(-1,-1),(0,-1),(1,-1),(2,-1)], 'color' : CYAN},
+    'I' : {'shape' : [(-1,-1),(1,-1),(0,-1),(2,-1)], 'color' : CYAN},
 }
 
 #Scoring
