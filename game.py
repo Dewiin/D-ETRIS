@@ -1,5 +1,6 @@
 from settings import *
 from random import choice
+from sys import exit
 
 from dropTimer import Timer
 
@@ -42,6 +43,11 @@ class Game():
 
         pygame.draw.rect(self.display, 'white', self.rect, 2, 2)        
 
+    def check_game_over(self):
+        for block in self.tetromino.image:
+            if block.pos.y < 0:
+                exit()
+
     def calculate_score(self, lines_cleared):
         self.lines_cleared += lines_cleared
         if lines_cleared > 0: self.score += (SCORE[lines_cleared] * self.level)
@@ -53,6 +59,7 @@ class Game():
         self.scoring_info(int(self.score), int(self.level), self.lines_cleared)
         
     def create_new_tetromino(self):
+        self.check_game_over()
         self.check_rows()
         self.tetromino = Tetromino(self.get_next_shape(), self.sprites, self.create_new_tetromino, self.field_data)
 
@@ -212,12 +219,19 @@ class Tetromino():
 
 class Block(pygame.sprite.Sprite):
     def __init__(self, pos, color, group):
+        #general
         super().__init__(group)
         self.image = pygame.Surface((TILE_SIZE, TILE_SIZE))
         self.image.fill(color)
 
-        self.pos = pygame.Vector2(pos) + pygame.Vector2(4,2)#offset
+        #offset
+        self.pos = pygame.Vector2(pos) + pygame.Vector2(4,0)
+        #rect
         self.rect = self.image.get_rect(topleft = (self.pos * TILE_SIZE)) 
+
+        #sound effects
+        self.landing_sound = pygame.mixer.Sound('Sound/landing.wav')
+        self.landing_sound.set_volume(0.1)
 
     def horizontal_collide(self, x, field_data):
         if not 0 <= x < COL:
@@ -227,8 +241,10 @@ class Block(pygame.sprite.Sprite):
         
     def bottom_collide(self, y, field_data):
         if not y < ROW:
+            self.landing_sound.play()
             return True
         if y >= 0 and field_data[y][int(self.pos.x)]:
+            self.landing_sound.play()
             return True
 
     def rotate_right(self, pivot):

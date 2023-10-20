@@ -21,6 +21,12 @@ class Main():
         self.score_screen = Score()
         self.game_screen = Game(self.get_next_shape, self.score_screen.scoring_info)
         self.preview_screen = Preview(self.next_shapes)
+
+        #sound
+        self.game_music = pygame.mixer.Sound('Sound/music.wav')
+
+        self.game_music.set_volume(0.1)
+        self.game_music.play(-1)
     
     def get_next_shape(self):
         next_shape = self.next_shapes.pop(0)
