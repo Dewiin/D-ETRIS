@@ -4,19 +4,20 @@ from random import choice
 from dropTimer import Timer
 
 class Game():
-    def __init__(self, get_next_shape):
+    def __init__(self, get_next_shape, scoring_info):
         #general
         self.image = pygame.Surface((GAME_WIDTH, GAME_HEIGHT)) #initialize display surface
         self.rect = self.image.get_rect(topleft = (PADDING, PADDING))
         self.display = pygame.display.get_surface()
         self.sprites = pygame.sprite.Group()
+        self.game_speed = GAME_UPDATE_SPEED
 
         #next_shape
         self.get_next_shape = get_next_shape
 
         #timer
         self.timers = {
-            'Block falling' : Timer(GAME_UPDATE_SPEED, True, self.block_fall),
+            'Block falling' : Timer(self.game_speed, True, self.block_fall),
             'Horizontal movement' : Timer(INPUT_DELAY, False, self.player_input)
         }
         self.timers['Block falling'].activate()
@@ -27,6 +28,12 @@ class Game():
         #tetromino
         self.tetromino = Tetromino(choice(list(TETROMINOS.keys())), self.sprites, self.create_new_tetromino, self.field_data)
 
+        #score
+        self.level = 1
+        self.score = 0
+        self.lines_cleared = 0
+        self.scoring_info = scoring_info
+
     def draw_grid(self):
         for i in range(1, GAME_HEIGHT):
             pygame.draw.line(self.image, GRAY, (0, i*TILE_SIZE), (GAME_WIDTH, i*TILE_SIZE))
@@ -35,6 +42,16 @@ class Game():
 
         pygame.draw.rect(self.display, 'white', self.rect, 2, 2)        
 
+    def calculate_score(self, lines_cleared):
+        self.lines_cleared += lines_cleared
+        if lines_cleared > 0: self.score += (SCORE[lines_cleared] * self.level)
+        if self.lines_cleared / 10 > self.level:
+            self.level += 1
+            self.game_speed *= .8
+            self.timers['Block falling'].cooldown = self.game_speed
+
+        self.scoring_info(int(self.score), int(self.level), self.lines_cleared)
+        
     def create_new_tetromino(self):
         self.check_rows()
         self.tetromino = Tetromino(self.get_next_shape(), self.sprites, self.create_new_tetromino, self.field_data)
@@ -81,6 +98,8 @@ class Game():
         
             for block in self.sprites:
                 self.field_data[int(block.pos.y)][int(block.pos.x)] = block
+        
+        self.calculate_score(len(deleted_rows))
         
     def update(self):
         #draw panel
@@ -197,7 +216,7 @@ class Block(pygame.sprite.Sprite):
         self.image = pygame.Surface((TILE_SIZE, TILE_SIZE))
         self.image.fill(color)
 
-        self.pos = pygame.Vector2(pos) + pygame.Vector2(4,0)#offset
+        self.pos = pygame.Vector2(pos) + pygame.Vector2(4,2)#offset
         self.rect = self.image.get_rect(topleft = (self.pos * TILE_SIZE)) 
 
     def horizontal_collide(self, x, field_data):

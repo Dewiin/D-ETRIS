@@ -18,8 +18,8 @@ class Main():
         self.next_shapes = [choice(list(TETROMINOS.keys())) for i in range(3)]
 
         #screen
-        self.game_screen = Game(self.get_next_shape)
         self.score_screen = Score()
+        self.game_screen = Game(self.get_next_shape, self.score_screen.scoring_info)
         self.preview_screen = Preview(self.next_shapes)
     
     def get_next_shape(self):
