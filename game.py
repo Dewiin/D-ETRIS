@@ -8,7 +8,7 @@ class Game():
     def __init__(self, get_next_shape, scoring_info):
         #general
         self.image = pygame.Surface((GAME_WIDTH, GAME_HEIGHT)) #initialize display surface
-        self.rect = self.image.get_rect(topleft = (PADDING, PADDING))
+        self.rect = self.image.get_rect(topleft = (SIDEBAR_WIDTH + PADDING*2, PADDING))
         self.display = pygame.display.get_surface()
         self.sprites = pygame.sprite.Group()
         self.game_speed = GAME_UPDATE_SPEED
@@ -35,6 +35,9 @@ class Game():
         self.lines_cleared = 0
         self.scoring_info = scoring_info
 
+        #hold queue
+        self.hold_queue = []
+
     def draw_grid(self):
         for i in range(1, GAME_HEIGHT):
             pygame.draw.line(self.image, GRAY, (0, i*TILE_SIZE), (GAME_WIDTH, i*TILE_SIZE))
@@ -45,7 +48,7 @@ class Game():
 
     def check_game_over(self):
         for block in self.tetromino.image:
-            if block.pos.y < 0:
+            if self.field_data[0][int(block.pos.x)]:
                 exit()
 
     def calculate_score(self, lines_cleared):
@@ -57,7 +60,23 @@ class Game():
             self.timers['Block falling'].cooldown = self.game_speed
 
         self.scoring_info(int(self.score), int(self.level), self.lines_cleared)
-        
+
+    def hold(self, get_shape):
+        if self.hold_queue:
+            temp_shape = self.tetromino.shape
+            for block in self.tetromino.image:
+                block.kill()
+            self.tetromino = Tetromino(self.hold_queue[0], self.sprites, self.create_new_tetromino, self.field_data)
+            self.hold_queue.clear()
+            self.hold_queue.append(temp_shape)
+            self.tetromino.hold(get_shape, temp_shape)
+        else:
+            self.hold_queue.append(self.tetromino.shape)
+            self.tetromino.hold(get_shape, self.tetromino.shape)
+            for block in self.tetromino.image:
+                block.kill()
+            self.create_new_tetromino()
+
     def create_new_tetromino(self):
         self.check_game_over()
         self.check_rows()
@@ -138,12 +157,14 @@ class Tetromino():
         self.create_new_tetromino = create_new
 
     def sides_colliding(self, amount):
+        #if tetromino block is at edge of game board
         collision_list = [block.horizontal_collide(int(block.pos.x + amount), self.field_data) for block in self.image]
         if any(collision_list):
             return True
         return False
     
     def bottom_colliding(self, amount):
+        #if tetromino block is at floor of game board
         collision_list = [block.bottom_collide(int(block.pos.y + amount), self.field_data) for block in self.image]
         if any(collision_list):
             return True
@@ -217,6 +238,9 @@ class Tetromino():
             for i, block in enumerate(self.image):
                 block.pos = new_block_positions[i]
 
+    def hold(self, get_shape, shape):
+        get_shape(shape)
+
 class Block(pygame.sprite.Sprite):
     def __init__(self, pos, color, group):
         #general
@@ -225,7 +249,7 @@ class Block(pygame.sprite.Sprite):
         self.image.fill(color)
 
         #offset
-        self.pos = pygame.Vector2(pos) + pygame.Vector2(4,0)
+        self.pos = pygame.Vector2(pos) + pygame.Vector2(4,2)
         #rect
         self.rect = self.image.get_rect(topleft = (self.pos * TILE_SIZE)) 
 
