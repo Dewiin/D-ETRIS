@@ -41,6 +41,7 @@ class Game():
 
         #sounds
         self.next_level_sound = pygame.mixer.Sound('Sound/next-level.mp3')
+        self.next_level_sound.set_volume(0.1)
 
     def draw_grid(self):
         for i in range(1, GAME_HEIGHT):
@@ -51,6 +52,10 @@ class Game():
         pygame.draw.rect(self.display, 'white', self.rect, 2, 2)        
 
     def restart(self):
+        #destroy current tetromino
+        for block in self.tetromino.image:
+            block.kill()
+
         #destroy all blocks
         for i in range(ROW):
             for block in self.field_data[i]:

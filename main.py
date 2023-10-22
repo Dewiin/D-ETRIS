@@ -33,8 +33,7 @@ class Main():
         self.hold_queue = Hold_Queue()
 
         #sound
-        self.game_music = pygame.mixer.Sound('Sound/music.wav')
-        self.game_music.set_volume(0.1)
+        self.game_music = pygame.mixer.Sound('Sound/PHONK.mp3')
         self.game_music.play(-1)
         self.game_over_sound = pygame.mixer.Sound('Sound/game-over.mp3')
         self.game_over_sound.set_volume(0.1)
@@ -83,7 +82,7 @@ class Main():
             
             if self.game_active:
                 #music
-                self.game_music.set_volume(0.1)
+                self.game_music.set_volume(0.3)
 
                 #screens
                 self.game_screen.update()
