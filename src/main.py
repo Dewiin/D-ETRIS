@@ -15,7 +15,7 @@ class Main():
         pygame.display.set_caption("D-ETRIS")
         self.clock = pygame.time.Clock()
         self.game_active = True
-        self.game_over_screen = pygame.image.load('Screens/gameover.png').convert()
+        self.game_over_screen = pygame.image.load('../Screens/gameover.png').convert()
         self.game_over_screen = pygame.transform.rotozoom(self.game_over_screen, 0, 0.5)
         self.restart_button = pygame.Rect(393, 440, TILE_SIZE*2, TILE_SIZE*2)
 
@@ -33,9 +33,9 @@ class Main():
         self.hold_queue = Hold_Queue()
 
         #sound
-        self.game_music = pygame.mixer.Sound('Sound/PHONK.mp3')
+        self.game_music = pygame.mixer.Sound('../Sound/PHONK.mp3')
         self.game_music.play(-1)
-        self.game_over_sound = pygame.mixer.Sound('Sound/game-over.mp3')
+        self.game_over_sound = pygame.mixer.Sound('../Sound/game-over.mp3')
         self.game_over_sound.set_volume(0.1)
 
         self.game_over_played = False
@@ -74,7 +74,6 @@ class Main():
                         self.game_screen.hold(self.hold_queue.get_shape)
                 else:
                     if event.type == pygame.MOUSEBUTTONDOWN and self.restart_button.collidepoint(pygame.mouse.get_pos()):
-                        self.game_screen.restart()
                         self.hold_queue.shape = ''
                         self.first_hold = True
                         self.game_over_played = False

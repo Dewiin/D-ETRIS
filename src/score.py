@@ -8,7 +8,7 @@ class Score():
         self.display = pygame.display.get_surface()
 
         #font
-        self.game_font = pygame.font.Font('Graphics/Russo_One.ttf', 30)
+        self.game_font = pygame.font.Font('../Graphics/Russo_One.ttf', 30)
         self.score, self.level, self.lines_cleared = 0, 1, 0
 
     def scoring_info(self, score, level, lines_cleared):

@@ -9,7 +9,7 @@ class Hold_Queue():
         self.shape = ''
 
         #font
-        self.font = pygame.font.Font('Graphics/Russo_One.ttf', 30)
+        self.font = pygame.font.Font('../Graphics/Russo_One.ttf', 30)
         self.queue_surface = self.font.render('HOLD', False, 'white')
         self.queue_rect = self.queue_surface.get_rect(center = ((SIDEBAR_WIDTH+PADDING*2)/2, PADDING*2))
 

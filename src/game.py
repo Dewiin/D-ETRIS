@@ -40,7 +40,7 @@ class Game():
         self.hold_queue = []
 
         #sounds
-        self.next_level_sound = pygame.mixer.Sound('Sound/next-level.mp3')
+        self.next_level_sound = pygame.mixer.Sound('../Sound/next-level.mp3')
         self.next_level_sound.set_volume(0.1)
 
     def draw_grid(self):
@@ -74,7 +74,8 @@ class Game():
 
     def check_game_over(self):
         for block in self.tetromino.image:
-            if self.field_data[0][int(block.pos.x)]:
+            if block.pos.y < 0:
+                self.restart()
                 self.game_active(False)
 
     def calculate_score(self, lines_cleared):
@@ -290,14 +291,15 @@ class Block(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft = (self.pos * TILE_SIZE)) 
 
         #sound effects
-        self.landing_sound = pygame.mixer.Sound('Sound/landing.wav')
+        self.landing_sound = pygame.mixer.Sound('../Sound/landing.wav')
         self.landing_sound.set_volume(0.1)
 
     def horizontal_collide(self, x, field_data):
         if not 0 <= x < COL:
             return True
-        if field_data[int(self.pos.y)][x]:
-            return True
+        if self.pos.y >= 0:
+            if field_data[int(self.pos.y)][x]:
+                return True
         
     def bottom_collide(self, y, field_data):
         if not y < ROW:

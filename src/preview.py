@@ -9,7 +9,7 @@ class Preview():
 
         #next shapes
         self.next_shapes = next_shapes
-        self.preview_images = {shape: pygame.image.load(f'Graphics/{shape}.png').convert_alpha() for shape in TETROMINOS.keys()}
+        self.preview_images = {shape: pygame.image.load(f'../Graphics/{shape}.png').convert_alpha() for shape in TETROMINOS.keys()}
 
     def draw_shapes(self):
         #display preview shapes
