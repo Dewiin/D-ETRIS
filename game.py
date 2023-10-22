@@ -5,13 +5,17 @@ from sys import exit
 from dropTimer import Timer
 
 class Game():
-    def __init__(self, get_next_shape, scoring_info):
+    def __init__(self, get_next_shape, scoring_info, game_active):
         #general
         self.image = pygame.Surface((GAME_WIDTH, GAME_HEIGHT)) #initialize display surface
         self.rect = self.image.get_rect(topleft = (SIDEBAR_WIDTH + PADDING*2, PADDING))
         self.display = pygame.display.get_surface()
         self.sprites = pygame.sprite.Group()
         self.game_speed = GAME_UPDATE_SPEED
+        self.game_active = game_active
+
+        #input control
+        self.allow_inputs = True
 
         #next_shape
         self.get_next_shape = get_next_shape
@@ -40,16 +44,33 @@ class Game():
 
     def draw_grid(self):
         for i in range(1, GAME_HEIGHT):
-            pygame.draw.line(self.image, GRAY, (0, i*TILE_SIZE), (GAME_WIDTH, i*TILE_SIZE))
+            pygame.draw.line(self.image, '#353535', (0, i*TILE_SIZE), (GAME_WIDTH, i*TILE_SIZE))
         for j in range(1, GAME_WIDTH):
-            pygame.draw.line(self.image, GRAY, (j*TILE_SIZE, 0), (j*TILE_SIZE, GAME_HEIGHT))
+            pygame.draw.line(self.image, '#353535', (j*TILE_SIZE, 0), (j*TILE_SIZE, GAME_HEIGHT))
 
         pygame.draw.rect(self.display, 'white', self.rect, 2, 2)        
+
+    def restart(self):
+        #destroy all blocks
+        for i in range(ROW):
+            for block in self.field_data[i]:
+                if block: block.kill()
+
+        #restart field data
+        self.field_data = [[0 for x in range(COL)] for y in range(ROW)]
+
+        #clear hold queue
+        self.hold_queue.clear()
+
+        #restart scores
+        self.level = 1
+        self.score = 0
+        self.lines_cleared = 0
 
     def check_game_over(self):
         for block in self.tetromino.image:
             if self.field_data[0][int(block.pos.x)]:
-                exit()
+                self.game_active(False)
 
     def calculate_score(self, lines_cleared):
         self.lines_cleared += lines_cleared
@@ -63,18 +84,27 @@ class Game():
 
     def hold(self, get_shape):
         if self.hold_queue:
+            #store current tetromino
             temp_shape = self.tetromino.shape
+            #kill tetromino on screen
             for block in self.tetromino.image:
                 block.kill()
+            #swap with tetromino in hold queue
             self.tetromino = Tetromino(self.hold_queue[0], self.sprites, self.create_new_tetromino, self.field_data)
+            #clear hold queue and add temp tetromino
             self.hold_queue.clear()
             self.hold_queue.append(temp_shape)
+            #change png in hold queue
             self.tetromino.hold(get_shape, temp_shape)
         else:
+            #add current tetromino to hold queue
             self.hold_queue.append(self.tetromino.shape)
+            #add png to display in hold queue
             self.tetromino.hold(get_shape, self.tetromino.shape)
+            #kill current tetromino
             for block in self.tetromino.image:
                 block.kill()
+            #continue to next tetromino in previews
             self.create_new_tetromino()
 
     def create_new_tetromino(self):
@@ -249,7 +279,7 @@ class Block(pygame.sprite.Sprite):
         self.image.fill(color)
 
         #offset
-        self.pos = pygame.Vector2(pos) + pygame.Vector2(4,2)
+        self.pos = pygame.Vector2(pos) + pygame.Vector2(4,0)
         #rect
         self.rect = self.image.get_rect(topleft = (self.pos * TILE_SIZE)) 
 
