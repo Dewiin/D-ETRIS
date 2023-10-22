@@ -14,9 +14,6 @@ class Game():
         self.game_speed = GAME_UPDATE_SPEED
         self.game_active = game_active
 
-        #input control
-        self.allow_inputs = True
-
         #next_shape
         self.get_next_shape = get_next_shape
 
@@ -41,6 +38,9 @@ class Game():
 
         #hold queue
         self.hold_queue = []
+
+        #sounds
+        self.next_level_sound = pygame.mixer.Sound('Sound/next-level.mp3')
 
     def draw_grid(self):
         for i in range(1, GAME_HEIGHT):
@@ -76,6 +76,7 @@ class Game():
         self.lines_cleared += lines_cleared
         if lines_cleared > 0: self.score += (SCORE[lines_cleared] * self.level)
         if self.lines_cleared / 10 > self.level:
+            self.next_level_sound.play()
             self.level += 1
             self.game_speed *= .8
             self.timers['Block falling'].cooldown = self.game_speed
