@@ -6,7 +6,7 @@ D-etris is my implementation of a Tetris Clone.
 
 ## Build and Run
 1) Clone the repository
-2) Navigate to src
+2) Navigate to src:
 ```cd src```
 3) Run the executable:
 ```python3 main.py```
